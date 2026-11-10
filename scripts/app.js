@@ -16,6 +16,7 @@ function saveTask(){
             data: JSON.stringify(taskToSave),
             contentType: "application/json",
             success: function(response){
+                displayTask(response || taskToSave )
                 console.log(response);
             },
             error: function(fails){
@@ -29,14 +30,21 @@ function saveTask(){
 const serverName = "https://106api-b0bnggbsgnezbzcz.westus3-01.azurewebsites.net/api/tasks";
 
 function updateTask(){
-    $.ajax({
+    let btn = $(this);
+    let element = btn.closest(".task");
+    let id = element.attr("id");
+    console.log(id);
+    // 
+
+
+    $.ajax({// Async JavaScript XML
         type: "PUT", //HTTP verb: UPDATE
-        url: "https://106api-b0bnggbsgnezbzcz.westus3-01.azurewebsites.net/api/tasks/1", 
+        url: serverName + "/" + id, 
         data: JSON.stringify({
             title: "Hello",
             budget: 999999,
         }),
-        contentType: "apploication/json",
+        contentType: "application/json",
         success: function(response){
             console.log(response);
         },
@@ -77,6 +85,7 @@ function displayTask(task) {
         <label>Due: ${task.date}</label>
         <label>Budget: $${task.budget}</label>
       </div>
+      <button class="btn-edit">Edit</button>
       <button class="btn-delete">Delete</button>
     </div>`;
 
@@ -93,6 +102,17 @@ function deleteTask(){
     // 3. Get the id
     let id = element.attr("id");
     console.log(id);
+
+    $.ajax({// Async JavScript XML
+        type: "DELETE",
+        url: serverName + "/" + id, // amazon.com/products
+        success: function(){
+            element.fadeOut(500, function(){
+                 $(this).remove();
+            })
+            
+        }
+    })
 }
 
 function init(){
@@ -102,7 +122,7 @@ function init(){
     // Let's try the delete button
     //$(".btn-delete").click(deleteTask);
     $(".list").on("click", ".btn-delete", deleteTask);
-
+    $(".list").on("click", ".btn-edit", updateTask);
     // load data from the server
     loadTask();
 }
